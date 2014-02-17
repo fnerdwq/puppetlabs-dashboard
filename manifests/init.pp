@@ -228,16 +228,16 @@ class dashboard (
         owner   => '0',
         group   => '0',
         mode    => '0644',
-        require => Package[$dashboard_package],
+        require => Package[$dashboard::params::dashboard_package],
       }
       file { 'dashboard_workers_config':
-        ensure =>  present,
-        path => $dashboard_workers_config,
+        ensure  =>  present,
+        path    => $dashboard_workers_config,
         content => template("dashboard/workers.config.${::osfamily}.erb"),
-        owner => '0',
-        group => '0',
-        mode => '0644',
-        require => Package[$dashboard_package]
+        owner   => '0',
+        group   => '0',
+        mode    => '0644',
+        require => Package[$dashboard::params::dashboard_package]
       }
       # enable the workers service
       service { $dashboard_workers_service:
@@ -257,10 +257,10 @@ class dashboard (
       owner   => '0',
       group   => '0',
       mode    => '0644',
-      require => Package[$dashboard_package],
+      require => Package[$dashboard::params::dashboard_package],
     }
 
-    service { $dashboard_service:
+    service { $dashboard::params::dashboard_service:
       ensure     => running,
       enable     => true,
       hasrestart => true,
@@ -269,8 +269,8 @@ class dashboard (
     }
   }
 
-  package { $dashboard_package:
-    ensure  => $dashboard_version,
+  package { $dashboard::params::dashboard_package:
+    ensure  => $dashboard::params::dashboard_version,
     require => [ Package['rdoc'], Package['rack']],
   }
 
@@ -290,14 +290,14 @@ class dashboard (
     mode    => '0644',
     owner   => $dashboard_user,
     group   => $dashboard_group,
-    require => Package[$dashboard_package],
+    require => Package[$dashboard::params::dashboard_package],
   }
 
-  file { [ "${dashboard::params::dashboard_root}/public",
-           "${dashboard::params::dashboard_root}/tmp",
-           "${dashboard::params::dashboard_root}/log",
-           "${dashboard::params::dashboard_root}/spool",
-           '/etc/puppet-dashboard' ]:
+  file { ["${dashboard_root}/public",
+          "${dashboard_root}/tmp",
+          "${dashboard_root}/log",
+          "${dashboard_root}/spool",
+          '/etc/puppet-dashboard']:
     ensure       => directory,
     recurse      => true,
     recurselimit => '1',
@@ -308,7 +308,7 @@ class dashboard (
     content => template('dashboard/database.yml.erb'),
   }
 
-  file { "${dashboard::params::dashboard_root}/config/database.yml":
+  file { "${dashboard_root}/config/database.yml":
     ensure => 'link',
     target => '/etc/puppet-dashboard/database.yml',
   }
@@ -323,12 +323,12 @@ class dashboard (
     }
   }
 
-  file { "${dashboard::params::dashboard_root}/config/settings.yml":
+  file { "${dashboard_root}/config/settings.yml":
     ensure => 'link',
     target => '/etc/puppet-dashboard/settings.yml',
   }
 
-  file { [ "${dashboard::params::dashboard_root}/log/production.log", "${dashboard::params::dashboard_root}/config/environment.rb" ]:
+  file { [ "${dashboard_root}/log/production.log", "${dashboard_root}/config/environment.rb" ]:
     ensure => file,
     mode   => '0644',
   }
@@ -343,11 +343,11 @@ class dashboard (
 
   exec { 'db-migrate':
     command => 'rake RAILS_ENV=production db:migrate',
-    cwd     => $dashboard::params::dashboard_root,
+    cwd     => $dashboard_root,
     path    => '/usr/bin/:/usr/local/bin/',
     creates => "/var/lib/mysql/${dashboard_db}/nodes.frm",
-    require => [Package[$dashboard_package], Mysql::Db[$dashboard_db],
-                File["${dashboard::params::dashboard_root}/config/database.yml"]],
+    require => [Package[$dashboard::params::dashboard_package], Mysql::Db[$dashboard_db],
+                File["${dashboard_root}/config/database.yml"]],
   }
 
   mysql::db { $dashboard_db:
