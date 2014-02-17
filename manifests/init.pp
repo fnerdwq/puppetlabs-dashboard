@@ -32,19 +32,58 @@
 #   [*dashboard_port*]
 #     - The port on which puppet-dashboard should run
 #
-#   [*dashboard_time_zone*]
+#   [*time_zone*]
 #     - The timezone of the dashboard page
 #
-#   [*dashboard_datetime_format*]
-#     - The datetime format to use 
+#   [*datetime_format*]
+#     - The datetime format to use
 #       (see http://ruby-doc.org/core/classes/Time.html#M000298)
 #
-#   [*dashboard_enable_read_only_mode*]
-#     - Disable the UI actions for editing nodes, classes, groups and reports. 
+#   [*enable_read_only_mode*]
+#     - Disable the UI actions for editing nodes, classes, groups and reports.
 #
-#   [*dashboard_no_longer_reporting_cutoff*]
+#   [*no_longer_reporting_cutoff*]
 #     - Amount of time in seconds since last report before a node is considered
 #       no longer reporting
+#
+#   [*cn_name*]
+#     - Node name to use when contacting the puppet master.
+#
+#   [*ca_crl_path*]
+#
+#   [*ca_certificate_path*]
+#
+#   [*certificate_path*]
+#
+#   [*private_key_path*]
+#
+#   [*public_key_path*]
+#
+#   [*ca_server*]
+#     -  Hostname of the certificate authority.
+#
+#   [*ca_port*]
+#     - Port for the certificate authority.
+#
+#   [*enable_inventory_service*]
+#     - The "inventory service" allows you to connect to a puppet master to
+#       retrieve and node facts
+#
+#   [*inventory_server*]
+#     - Hostname of the inventory server.
+#
+#   [*inventory_port*]
+#     - Port for the inventory server.
+#
+#   [*use_file_bucket_diffs*]
+#     - Set this to true to allow Dashboard to display diffs on files that
+#       are archived in the file bucket.
+#
+#   [*file_bucket_server*]
+#     - Hostname of the file bucket server.
+#
+#   [*file_bucket_port*]
+#     - Port for the file bucket server.
 #
 #   [*mysql_root_pw*]
 #     - Password for root on MySQL
@@ -117,37 +156,49 @@
 #   puppet-dashboard.
 #
 class dashboard (
-  $dashboard_ensure          = $dashboard::params::dashboard_ensure,
-  $dashboard_user            = $dashboard::params::dashboard_user,
-  $dashboard_group           = $dashboard::params::dashboard_group,
-  $dashboard_password        = $dashboard::params::dashboard_password,
-  $dashboard_db              = $dashboard::params::dashboard_db,
-  $dashboard_environment     = $dashboard::params::dashboard_environment,
-  $dashboard_charset         = $dashboard::params::dashboard_charset,
-  $dashboard_site            = $dashboard::params::dashboard_site,
-  $dashboard_port            = $dashboard::params::dashboard_port,
-  $dashboard_config          = $dashboard::params::dashboard_config,
-  $dashboard_workers_service = $dashboard::params::dashboard_workers_service,
-  $dashboard_workers_config  = $dashboard::params::dashboard_workers_config,
-  $dashboard_num_workers     = $dashboard::params::dashboard_num_workers,
-  $dashboard_workers_start   = $dashboard::params::dashboard_workers_start,
-  $dashboard_time_zone       = $dashboard::params::dashboard_time_zone,
-  $dashboard_datetime_format = $dashboard::params::dashboard_datetime_format,
-  $dashboard_enable_read_only_mode 
-                             = $dashboard::params::dashboard_enable_read_only_mode,
-  $dashboard_no_longer_reporting_cutoff
-                             = $dashboard::params::dashboard_no_longer_reporting_cutoff,
-  $mysql_root_pw             = $dashboard::params::mysql_root_pw,
-  $passenger                 = $dashboard::params::passenger,
-  $passenger_install         = $dashboard::params::passenger_install,
-  $mysql_package_provider    = $dashboard::params::mysql_package_provider,
-  $ruby_mysql_package        = $dashboard::params::ruby_mysql_package,
-  $dashboard_config          = $dashboard::params::dashboard_config,
-  $dashboard_root            = $dashboard::params::dashboard_root,
-  $rails_base_uri            = $dashboard::params::rails_base_uri,
-  $rack_version              = $dashboard::params::rack_version,
-  $cron_optimize             = $dashboard::params::cron_optimize,
-  $cron_prune_reports        = $dashboard::params::cron_prune_reports
+  $dashboard_ensure           = $dashboard::params::dashboard_ensure,
+  $dashboard_user             = $dashboard::params::dashboard_user,
+  $dashboard_group            = $dashboard::params::dashboard_group,
+  $dashboard_password         = $dashboard::params::dashboard_password,
+  $dashboard_db               = $dashboard::params::dashboard_db,
+  $dashboard_environment      = $dashboard::params::dashboard_environment,
+  $dashboard_charset          = $dashboard::params::dashboard_charset,
+  $dashboard_site             = $dashboard::params::dashboard_site,
+  $dashboard_port             = $dashboard::params::dashboard_port,
+  $dashboard_config           = $dashboard::params::dashboard_config,
+  $dashboard_workers_service  = $dashboard::params::dashboard_workers_service,
+  $dashboard_workers_config   = $dashboard::params::dashboard_workers_config,
+  $dashboard_num_workers      = $dashboard::params::dashboard_num_workers,
+  $dashboard_workers_start    = $dashboard::params::dashboard_workers_start,
+  $time_zone                  = $dashboard::params::time_zone,
+  $datetime_format            = $dashboard::params::datetime_format,
+  $enable_read_only_mode      = $dashboard::params::enable_read_only_mode,
+  $no_longer_reporting_cutoff = $dashboard::params::no_longer_reporting_cutoff,
+  $cn_name                    = $dashboard::params::cn_name,
+  $ca_crl_path                = $dashboard::params::ca_crl_path,
+  $ca_certificate_path        = $dashboard::params::ca_certificate_path,
+  $certificate_path           = $dashboard::params::certificate_path,
+  $private_key_path           = $dashboard::params::private_key_path,
+  $public_key_path            = $dashboard::params::public_key_path,
+  $ca_server                  = $dashboard::params::ca_server,
+  $ca_port                    = $dashboard::params::ca_port,
+  $enable_inventory_service   = $dashboard::params::enable_inventory_service,
+  $inventory_server           = $dashboard::params::inventory_server,
+  $inventory_port             = $dashboard::params::inventory_port,
+  $use_file_bucket_diffs      = $dashboard::params::use_file_bucket_diffs,
+  $file_bucket_server         = $dashboard::params::file_bucket_server,
+  $file_bucket_port           = $dashboard::params::file_bucket_port,
+  $mysql_root_pw              = $dashboard::params::mysql_root_pw,
+  $passenger                  = $dashboard::params::passenger,
+  $passenger_install          = $dashboard::params::passenger_install,
+  $mysql_package_provider     = $dashboard::params::mysql_package_provider,
+  $ruby_mysql_package         = $dashboard::params::ruby_mysql_package,
+  $dashboard_config           = $dashboard::params::dashboard_config,
+  $dashboard_root             = $dashboard::params::dashboard_root,
+  $rails_base_uri             = $dashboard::params::rails_base_uri,
+  $rack_version               = $dashboard::params::rack_version,
+  $cron_optimize              = $dashboard::params::cron_optimize,
+  $cron_prune_reports         = $dashboard::params::cron_prune_reports
 ) inherits dashboard::params {
 
   class { 'mysql::server':
@@ -305,10 +356,12 @@ class dashboard (
     charset  => $dashboard_charset,
   }
 
+  # add also to puppet group to read private ssl key
   user { $dashboard_user:
       ensure     => 'present',
       comment    => 'Puppet Dashboard',
       gid        => $dashboard_group,
+      groups     => ['puppet'],
       shell      => '/sbin/nologin',
       managehome => true,
       home       => "/home/${dashboard_user}",

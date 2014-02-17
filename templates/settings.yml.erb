@@ -12,48 +12,48 @@
 
 # Node name to use when contacting the puppet master.  This is the
 # CN that is used in Dashboard's certificate.
-cn_name: 'dashboard'
+cn_name: '<%= @cn_name %>'
 
-ca_crl_path: 'certs/dashboard.ca_crl.pem'
+ca_crl_path: '<%= @ca_crl_path -%>'
 
-ca_certificate_path: 'certs/dashboard.ca_cert.pem'
+ca_certificate_path: '<%= @ca_certificate_path -%>'
 
-certificate_path: 'certs/dashboard.cert.pem'
+certificate_path: '<%= @certificate_path -%>'
 
-private_key_path: 'certs/dashboard.private_key.pem'
+private_key_path: '<%= @private_key_path -%>'
 
-public_key_path: 'certs/dashboard.public_key.pem'
+public_key_path: '<%= @public_key_path -%>'
 
 # Hostname of the certificate authority.
-ca_server: 'puppet'
+ca_server: '<%= @ca_server -%>'
 
 # Port for the certificate authority.
-ca_port: 8140
+ca_port: <%= @ca_port %>
 
 # Key length for SSL certificates
 key_length: 1024
 
 # The "inventory service" allows you to connect to a puppet master to retrieve and node facts
-enable_inventory_service: false
+enable_inventory_service: <%= @enable_inventory_service %>
 
 # Hostname of the inventory server.
-inventory_server: 'puppet'
+inventory_server: '<%= @inventory_server -%>'
 
 # Port for the inventory server.
-inventory_port: 8140
+inventory_port: <%= @inventory_port %>
 
 # Set this to true to allow Dashboard to display diffs on files that
 # are archived in the file bucket.
-use_file_bucket_diffs: false
+use_file_bucket_diffs: <%= @use_file_bucket_diffs %>
 
 # Hostname of the file bucket server.
-file_bucket_server: 'puppet'
+file_bucket_server: '<%= @file_bucket_server -%>'
 
 # Port for the file bucket server.
-file_bucket_port: 8140
+file_bucket_port: <%= @file_bucket_port %>
 
 # Amount of time in seconds since last report before a node is considered no longer reporting
-no_longer_reporting_cutoff: <%= @dashboard_no_longer_reporting_cutoff -%>
+no_longer_reporting_cutoff: <%= @no_longer_reporting_cutoff -%>
 
 # How many days of history to display on the "Daily Run Status" graph
 daily_run_history_length: 30
@@ -63,12 +63,12 @@ use_external_node_classification: true
 # Uncomment the following line to set a local time zone.  Run
 # "rake time:zones:local" for the name of your local time zone.
 #time_zone: 'Pacific Time (US & Canada)'
-<% if @dashboard_time_zone -%>
-time_zone: '<%= @dashboard_time_zone -%>'
+<% if @time_zone -%>
+time_zone: '<%= @time_zone -%>'
 <% end -%>
 
 # Look at http://ruby-doc.org/core/classes/Time.html#M000298 for the strftime formatting
-datetime_format: '<%= @dashboard_datetime_format -%>'
+datetime_format: '<%= @datetime_format -%>'
 date_format: '%A, %B %e, %Y'
 
 # Set this to the URL of an image. The image will be scaled to the specified dimensions.
@@ -83,7 +83,7 @@ custom_logo_alt_text: 'Puppet Dashboard'
 disable_legacy_report_upload_url: false
 
 # Disables the UI and controller actions for editing nodes, classes, groups and reports.  Report submission is still allowed
-enable_read_only_mode: <%= @dashboard_enable_read_only_mode %>
+enable_read_only_mode: <%= @enable_read_only_mode %>
 
 # Default number of items of each kind to display per page
 nodes_per_page: 20

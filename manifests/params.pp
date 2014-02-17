@@ -12,19 +12,34 @@
 #
 class dashboard::params {
 
-  $dashboard_ensure                     = 'present'
-  $dashboard_user                       = 'puppet-dashboard'
-  $dashboard_group                      = 'puppet-dashboard'
-  $dashboard_password                   = 'changeme'
-  $dashboard_db                         = 'dashboard_production'
-  $dashboard_charset                    = 'utf8'
-  $dashboard_environment                = 'production'
-  $dashboard_site                       = $::fqdn
-  $dashboard_port                       = '8080'
-  $dashboard_time_zone                  = undef
-  $dashboard_datetime_format            = '%Y-%m-%d %H:%M %Z'
-  $dashboard_enable_read_only_mode      = false
-  $dashboard_no_longer_reporting_cutoff = 3600
+  $dashboard_ensure           = 'present'
+  $dashboard_user             = 'puppet-dashboard'
+  $dashboard_group            = 'puppet-dashboard'
+  $dashboard_password         = 'changeme'
+  $dashboard_db               = 'dashboard_production'
+  $dashboard_charset          = 'utf8'
+  $dashboard_environment      = 'production'
+  $dashboard_site             = $::fqdn
+  $dashboard_port             = '8080'
+
+  $time_zone                  = undef
+  $datetime_format            = '%Y-%m-%d %H:%M %Z'
+  $enable_read_only_mode      = false
+  $no_longer_reporting_cutoff = 3600
+  $cn_name                    = $::fqdn
+  $ca_crl_path                = "${::puppet_vardir}/ssl/crl.pem"
+  $ca_certificate_path        = "${::puppet_vardir}/ssl/certs/ca.pem"
+  $certificate_path           = "${::puppet_vardir}/ssl/certs/${::fqdn}.pem"
+  $private_key_path           = "${::puppet_vardir}/ssl/private_keys/${::fqdn}.pem"
+  $public_key_path            = "${::puppet_vardir}/ssl/public_keys/${::fqdn}.pem"
+  $ca_server                  = "puppet.${::domain}"
+  $ca_port                    = 8140
+  $enable_inventory_service   = false
+  $inventory_server           = "puppet.${::domain}"
+  $inventory_port             = 8140
+  $use_file_bucket_diffs      = false
+  $file_bucket_server         =  "puppet.${::domain}"
+  $file_bucket_port           = 8140
 
   $passenger                       = false
   $mysql_root_pw                   = 'changemetoo'
