@@ -362,7 +362,7 @@ class dashboard (
       comment    => 'Puppet Dashboard',
       gid        => $dashboard_group,
       groups     => ['puppet'],
-      shell      => '/sbin/nologin',
+      shell      => '/bin/false',
       managehome => true,
       home       => "/home/${dashboard_user}",
   }
