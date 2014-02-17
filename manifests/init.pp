@@ -14,7 +14,7 @@
 #   [*dashboard_group*]
 #     - Name of the puppet-dashboard group
 #
-#   [*dashbaord_password*]
+#   [*dashboard_password*]
 #     - Password for the puppet-dashboard database use
 #
 #   [*dashboard_db*]
@@ -47,6 +47,18 @@
 #
 #   [*dashboard_config*]
 #     - The Dashboard configuration file
+#
+#   [*dashboard_workers_service*]
+#     - The Dashboard workers init service
+#
+#   [*dashboard_workers_config*]
+#     - Default config file for the Dashboard workers service
+#
+#   [*dashboard_num_workers*]
+#     - Number of dashboard workers to spawn
+#
+#   [*dashboard_workers_start*]
+#     - Enable the Dashboard init service
 #
 #   [*dashboard_root*]
 #     - The path to the Puppet Dashboard library
@@ -84,23 +96,29 @@
 #   puppet-dashboard.
 #
 class dashboard (
-  $dashboard_ensure         = $dashboard::params::dashboard_ensure,
-  $dashboard_user           = $dashboard::params::dashboard_user,
-  $dashboard_group          = $dashboard::params::dashboard_group,
-  $dashboard_password       = $dashboard::params::dashboard_password,
-  $dashboard_db             = $dashboard::params::dashboard_db,
-  $dashboard_environment    = $dashboard::params::dashboard_environment,
-  $dashboard_charset        = $dashboard::params::dashboard_charset,
-  $dashboard_site           = $dashboard::params::dashboard_site,
-  $dashboard_port           = $dashboard::params::dashboard_port,
-  $dashboard_config         = $dashboard::params::dashboard_config,
-  $mysql_root_pw            = $dashboard::params::mysql_root_pw,
-  $passenger                = $dashboard::params::passenger,
-  $passenger_install        = $dashboard::params::passenger_install,
-  $dashboard_config         = $dashboard::params::dashboard_config,
-  $dashboard_root           = $dashboard::params::dashboard_root,
-  $rails_base_uri           = $dashboard::params::rails_base_uri,
-  $rack_version             = $dashboard::params::rack_version
+  $dashboard_ensure          = $dashboard::params::dashboard_ensure,
+  $dashboard_user            = $dashboard::params::dashboard_user,
+  $dashboard_group           = $dashboard::params::dashboard_group,
+  $dashboard_password        = $dashboard::params::dashboard_password,
+  $dashboard_db              = $dashboard::params::dashboard_db,
+  $dashboard_environment     = $dashboard::params::dashboard_environment,
+  $dashboard_charset         = $dashboard::params::dashboard_charset,
+  $dashboard_site            = $dashboard::params::dashboard_site,
+  $dashboard_port            = $dashboard::params::dashboard_port,
+  $dashboard_config          = $dashboard::params::dashboard_config,
+  $dashboard_workers_service = $dashboard::params::dashboard_workers_service,
+  $dashboard_workers_config  = $dashboard::params::dashboard_workers_config,
+  $dashboard_num_workers     = $dashboard::params::dashboard_num_workers,
+  $dashboard_workers_start   = $dashboard::params::dashboard_workers_start,
+  $mysql_root_pw             = $dashboard::params::mysql_root_pw,
+  $passenger                 = $dashboard::params::passenger,
+  $passenger_install         = $dashboard::params::passenger_install,
+  $mysql_package_provider    = $dashboard::params::mysql_package_provider,
+  $ruby_mysql_package        = $dashboard::params::ruby_mysql_package,
+  $dashboard_config          = $dashboard::params::dashboard_config,
+  $dashboard_root            = $dashboard::params::dashboard_root,
+  $rails_base_uri            = $dashboard::params::rails_base_uri,
+  $rack_version              = $dashboard::params::rack_version
 ) inherits dashboard::params {
 
   class { 'mysql::server':
@@ -119,6 +137,37 @@ class dashboard (
       dashboard_root    => $dashboard_root,
       rails_base_uri    => $rails_base_uri,
       passenger_install => $passenger_install,
+    }
+    # debian needs the configuration files for dashboard to start the
+    # dashboard workers
+    if $::osfamily == 'Debian' {
+      file { 'dashboard_config':
+        ensure  => present,
+        path    => $dashboard_config,
+        content => template("dashboard/config.${::osfamily}.erb"),
+        owner   => '0',
+        group   => '0',
+        mode    => '0644',
+        require => Package[$dashboard_package],
+      }
+      file { 'dashboard_workers_config':
+        ensure =>  present,
+        path => $dashboard_workers_config,
+        content => template("dashboard/workers.config.${::osfamily}.erb"),
+        owner => '0',
+        group => '0',
+        mode => '0644',
+        require => Package[$dashboard_package]
+      }
+      # enable the workers service
+      service { $dashboard_workers_service:
+        ensure     => running,
+        enable     => true,
+        hasrestart => true,
+        subscribe  => File['/etc/puppet-dashboard/database.yml'],
+        require    => Exec['db-migrate']
+      }
+
     }
   } else {
     file { 'dashboard_config':
