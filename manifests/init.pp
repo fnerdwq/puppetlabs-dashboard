@@ -32,6 +32,20 @@
 #   [*dashboard_port*]
 #     - The port on which puppet-dashboard should run
 #
+#   [*dashboard_time_zone*]
+#     - The timezone of the dashboard page
+#
+#   [*dashboard_datetime_format*]
+#     - The datetime format to use 
+#       (see http://ruby-doc.org/core/classes/Time.html#M000298)
+#
+#   [*dashboard_enable_read_only_mode*]
+#     - Disable the UI actions for editing nodes, classes, groups and reports. 
+#
+#   [*dashboard_no_longer_reporting_cutoff*]
+#     - Amount of time in seconds since last report before a node is considered
+#       no longer reporting
+#
 #   [*mysql_root_pw*]
 #     - Password for root on MySQL
 #
@@ -110,6 +124,12 @@ class dashboard (
   $dashboard_workers_config  = $dashboard::params::dashboard_workers_config,
   $dashboard_num_workers     = $dashboard::params::dashboard_num_workers,
   $dashboard_workers_start   = $dashboard::params::dashboard_workers_start,
+  $dashboard_time_zone       = $dashboard::params::dashboard_time_zone,
+  $dashboard_datetime_format = $dashboard::params::dashboard_datetime_format,
+  $dashboard_enable_read_only_mode 
+                             = $dashboard::params::dashboard_enable_read_only_mode,
+  $dashboard_no_longer_reporting_cutoff
+                             = $dashboard::params::dashboard_no_longer_reporting_cutoff,
   $mysql_root_pw             = $dashboard::params::mysql_root_pw,
   $passenger                 = $dashboard::params::passenger,
   $passenger_install         = $dashboard::params::passenger_install,
@@ -231,6 +251,21 @@ class dashboard (
   file { "${dashboard::params::dashboard_root}/config/database.yml":
     ensure => 'link',
     target => '/etc/puppet-dashboard/database.yml',
+  }
+
+  file {'/etc/puppet-dashboard/settings.yml':
+    ensure  => present,
+    content => template('dashboard/settings.yml.erb'),
+  }
+  if defined(Class['apache::service']) {
+    File['/etc/puppet-dashboard/settings.yml'] {
+      notify  => Class['apache::service'],
+    }
+  }
+
+  file { "${dashboard::params::dashboard_root}/config/settings.yml":
+    ensure => 'link',
+    target => '/etc/puppet-dashboard/settings.yml',
   }
 
   file { [ "${dashboard::params::dashboard_root}/log/production.log", "${dashboard::params::dashboard_root}/config/environment.rb" ]:

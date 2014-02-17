@@ -12,19 +12,24 @@
 #
 class dashboard::params {
 
-  $dashboard_ensure      = 'present'
-  $dashboard_user        = 'puppet-dashboard'
-  $dashboard_group       = 'puppet-dashboard'
-  $dashboard_password    = 'changeme'
-  $dashboard_db          = 'dashboard_production'
-  $dashboard_charset     = 'utf8'
-  $dashboard_environment = 'production'
-  $dashboard_site        = $::fqdn
-  $dashboard_port        = '8080'
-  $passenger             = false
-  $mysql_root_pw         = 'changemetoo'
-  $rails_base_uri        = '/'
-  $rack_version          = '1.1.2'
+  $dashboard_ensure                     = 'present'
+  $dashboard_user                       = 'puppet-dashboard'
+  $dashboard_group                      = 'puppet-dashboard'
+  $dashboard_password                   = 'changeme'
+  $dashboard_db                         = 'dashboard_production'
+  $dashboard_charset                    = 'utf8'
+  $dashboard_environment                = 'production'
+  $dashboard_site                       = $::fqdn
+  $dashboard_port                       = '8080'
+  $dashboard_time_zone                  = undef
+  $dashboard_datetime_format            = '%Y-%m-%d %H:%M %Z'
+  $dashboard_enable_read_only_mode      = false
+  $dashboard_no_longer_reporting_cutoff = 3600
+
+  $passenger                       = false
+  $mysql_root_pw                   = 'changemetoo'
+  $rails_base_uri                  = '/'
+  $rack_version                    = '1.1.2'
 
   case $::osfamily {
 
