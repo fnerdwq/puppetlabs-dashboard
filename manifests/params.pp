@@ -31,6 +31,9 @@ class dashboard::params {
   $rails_base_uri                  = '/'
   $rack_version                    = '1.1.2'
 
+  $cron_optimize                   = false
+  $cron_prune_reports              = undef
+
   case $::osfamily {
 
     'RedHat': {

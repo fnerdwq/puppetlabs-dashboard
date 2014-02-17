@@ -83,6 +83,13 @@
 #   [*rack_version*]
 #     - The version of the rack gem to install
 #
+#   [*cron_optimize*]
+#     - Install cronjob to optimze db (rake db:raw:optimize)
+#
+#   [*cron_prune_reports*]
+#     - Install cronjob to prune old reports, format: '<number> <unit>'
+#       where unit: min,hr,day,wk,mon,yr
+#
 # Actions:
 #
 # Requires:
@@ -138,7 +145,9 @@ class dashboard (
   $dashboard_config          = $dashboard::params::dashboard_config,
   $dashboard_root            = $dashboard::params::dashboard_root,
   $rails_base_uri            = $dashboard::params::rails_base_uri,
-  $rack_version              = $dashboard::params::rack_version
+  $rack_version              = $dashboard::params::rack_version,
+  $cron_optimize             = $dashboard::params::cron_optimize,
+  $cron_prune_reports        = $dashboard::params::cron_prune_reports
 ) inherits dashboard::params {
 
   class { 'mysql::server':
@@ -308,5 +317,32 @@ class dashboard (
   group { $dashboard_group:
       ensure => 'present',
   }
+
+  if str2bool($cron_optimize) {
+    cron {'dashboard optimize':
+      command => "cd ${dashboard_root} && RAILS_ENV=production rake db:raw:optimize 2> /dev/null",
+      user    => $dashboard_user,
+      hour    => 1,
+      minute  => 0,
+    }
+  }
+
+  if $cron_prune_reports {
+    $splitted = split($cron_prune_reports,' ')
+    $upto     = $splitted[0]
+    $unit     = $splitted[1]
+
+    validate_re($upto, '^\d+$')
+    validate_re($unit, ['^min$','^hr$','^day$','^wk$','^mon$','^yr$'])
+
+    cron {'dashboard prune reports':
+      command => "cd ${dashboard_root} && RAILS_ENV=production rake reports:prune upto=${upto} unit=${unit} 2> /dev/null",
+      user    => $dashboard_user,
+      hour    => 1,
+      minute  => 5,
+    }
+  }
+
+
 }
 
