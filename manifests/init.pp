@@ -287,9 +287,6 @@ class dashboard (
   }
 
   File {
-    mode    => '0644',
-    owner   => $dashboard_user,
-    group   => $dashboard_group,
     require => Package[$dashboard::params::dashboard_package],
   }
 
@@ -299,22 +296,34 @@ class dashboard (
           "${dashboard_root}/spool",
           '/etc/puppet-dashboard']:
     ensure       => directory,
+    mode         => '0644',
+    owner        => $dashboard_user,
+    group        => $dashboard_group,
     recurse      => true,
     recurselimit => '1',
   }
 
   file {'/etc/puppet-dashboard/database.yml':
     ensure  => present,
+    mode    => '0640',
+    owner   => $dashboard_user,
+    group   => $dashboard_group,
     content => template('dashboard/database.yml.erb'),
   }
 
   file { "${dashboard_root}/config/database.yml":
     ensure => 'link',
+    mode   => '0640',
+    owner  => $dashboard_user,
+    group  => $dashboard_group,
     target => '/etc/puppet-dashboard/database.yml',
   }
 
   file {'/etc/puppet-dashboard/settings.yml':
     ensure  => present,
+    mode    => '0644',
+    owner   => $dashboard_user,
+    group   => $dashboard_group,
     content => template('dashboard/settings.yml.erb'),
   }
   if defined(Class['apache::service']) {
@@ -325,12 +334,17 @@ class dashboard (
 
   file { "${dashboard_root}/config/settings.yml":
     ensure => 'link',
+    mode   => '0644',
+    owner  => $dashboard_user,
+    group  => $dashboard_group,
     target => '/etc/puppet-dashboard/settings.yml',
   }
 
   file { [ "${dashboard_root}/log/production.log", "${dashboard_root}/config/environment.rb" ]:
     ensure => file,
     mode   => '0644',
+    owner  => $dashboard_user,
+    group  => $dashboard_group,
   }
 
   file { '/etc/logrotate.d/puppet-dashboard':
