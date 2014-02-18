@@ -225,8 +225,8 @@ class dashboard (
         ensure  => present,
         path    => $dashboard_config,
         content => template("dashboard/config.${::osfamily}.erb"),
-        owner   => '0',
-        group   => '0',
+        owner   => root,
+        group   => root,
         mode    => '0644',
         require => Package[$dashboard::params::dashboard_package],
       }
@@ -234,8 +234,8 @@ class dashboard (
         ensure  =>  present,
         path    => $dashboard_workers_config,
         content => template("dashboard/workers.config.${::osfamily}.erb"),
-        owner   => '0',
-        group   => '0',
+        owner   => root,
+        group   => root,
         mode    => '0644',
         require => Package[$dashboard::params::dashboard_package]
       }
@@ -254,8 +254,8 @@ class dashboard (
       ensure  => present,
       path    => $dashboard_config,
       content => template("dashboard/config.${::osfamily}.erb"),
-      owner   => '0',
-      group   => '0',
+      owner   => root,
+      group   => root,
       mode    => '0644',
       require => Package[$dashboard::params::dashboard_package],
     }
@@ -336,8 +336,8 @@ class dashboard (
   file { '/etc/logrotate.d/puppet-dashboard':
     ensure  => present,
     content => template('dashboard/logrotate.erb'),
-    owner   => '0',
-    group   => '0',
+    owner   => root,
+    group   => root,
     mode    => '0644',
   }
 
