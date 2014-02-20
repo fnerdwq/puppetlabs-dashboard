@@ -12,15 +12,15 @@
 
 # Node name to use when contacting the puppet master.  This is the
 # CN that is used in Dashboard's certificate.
-cn_name: '<%= @cn_name %>'
+cn_name: '<%= @_cn_name %>'
 
 ca_crl_path: '<%= @ca_crl_path -%>'
 
 ca_certificate_path: '<%= @ca_certificate_path -%>'
 
-certificate_path: '<%= @certificate_path -%>'
+certificate_path: '<%= @_certificate_path -%>'
 
-private_key_path: '<%= @private_key_path -%>'
+private_key_path: '<%= @_private_key_path -%>'
 
 public_key_path: '<%= @public_key_path -%>'
 

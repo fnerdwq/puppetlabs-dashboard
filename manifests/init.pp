@@ -46,16 +46,23 @@
 #     - Amount of time in seconds since last report before a node is considered
 #       no longer reporting
 #
+#   [*use_puppet_certificates*]
+#     - Should the puppet certificates be reused for inventory/filebucket
+#       (copied to $dashboard_root/certs)
+#
 #   [*cn_name*]
 #     - Node name to use when contacting the puppet master.
+#       Will be overridden with $::fqdn if $use_puppet_certificates.
 #
 #   [*ca_crl_path*]
 #
 #   [*ca_certificate_path*]
 #
 #   [*certificate_path*]
+#     - Will be overridden if $use_puppet_certificates.
 #
 #   [*private_key_path*]
+#     - Will be overridden if $use_puppet_certificates.
 #
 #   [*public_key_path*]
 #
@@ -174,6 +181,7 @@ class dashboard (
   $datetime_format            = $dashboard::params::datetime_format,
   $enable_read_only_mode      = $dashboard::params::enable_read_only_mode,
   $no_longer_reporting_cutoff = $dashboard::params::no_longer_reporting_cutoff,
+  $use_puppet_certificates    = $dashboard::params::use_puppet_certificates,
   $cn_name                    = $dashboard::params::cn_name,
   $ca_crl_path                = $dashboard::params::ca_crl_path,
   $ca_certificate_path        = $dashboard::params::ca_certificate_path,
@@ -264,9 +272,44 @@ class dashboard (
       ensure     => running,
       enable     => true,
       hasrestart => true,
-      subscribe  => File['/etc/puppet-dashboard/database.yml'],
+      subscribe  => [ File['/etc/puppet-dashboard/database.yml'],
+                      File['/etc/puppet-dashboard/settings.yml'] ],
       require    => Exec['db-migrate']
     }
+  }
+
+  # should we reuse the puppet certificates?
+  if $use_puppet_certificates {
+    $_cn_name          = $::fqdn
+    $_private_key_path = "certs/${::fqdn}.private_key.pem"
+    $_certificate_path = "certs/${::fqdn}.cert.pem"
+
+    file { "${dashboard_root}/certs":
+      ensure => directory,
+      mode   => '0644',
+      owner  => $dashboard_user,
+      group  => $dashboard_group,
+    }
+    file { "${dashboard_root}/${_private_key_path}":
+      ensure => present,
+      mode   => '0600',
+      owner  => $dashboard_user,
+      group  => $dashboard_group,
+      source => "${::puppet_vardir}/ssl/private_keys/${::fqdn}.pem",
+    }
+    file { "${dashboard_root}/${_certificate_path}":
+      ensure  => present,
+      mode    => '0644',
+      owner   => $dashboard_user,
+      group   => $dashboard_group,
+      source  => "${::puppet_vardir}/ssl/certs/${::fqdn}.pem",
+      require => File["${dashboard_root}/${_private_key_path}"],
+      before  => File["${dashboard_root}/config/settings.yml"],
+    }
+  } else {
+    $_cn_name          = $cn_name
+    $_private_key_path = $private_key_path
+    $_certificate_path = $certificate_path
   }
 
   package { $dashboard::params::dashboard_package:
@@ -310,13 +353,13 @@ class dashboard (
     group   => $dashboard_group,
     content => template('dashboard/database.yml.erb'),
   }
-
   file { "${dashboard_root}/config/database.yml":
-    ensure => 'link',
-    mode   => '0640',
-    owner  => $dashboard_user,
-    group  => $dashboard_group,
-    target => '/etc/puppet-dashboard/database.yml',
+    ensure  => 'link',
+    mode    => '0640',
+    owner   => $dashboard_user,
+    group   => $dashboard_group,
+    target  => '/etc/puppet-dashboard/database.yml',
+    require => File['/etc/puppet-dashboard/database.yml'],
   }
 
   file {'/etc/puppet-dashboard/settings.yml':
@@ -326,18 +369,23 @@ class dashboard (
     group   => $dashboard_group,
     content => template('dashboard/settings.yml.erb'),
   }
+  file { "${dashboard_root}/config/settings.yml":
+    ensure  => 'link',
+    mode    => '0644',
+    owner   => $dashboard_user,
+    group   => $dashboard_group,
+    target  => '/etc/puppet-dashboard/settings.yml',
+    require => File['/etc/puppet-dashboard/settings.yml'],
+  }
+
+  # notify changes if apache service is managed
   if defined(Class['apache::service']) {
     File['/etc/puppet-dashboard/settings.yml'] {
       notify  => Class['apache::service'],
     }
-  }
-
-  file { "${dashboard_root}/config/settings.yml":
-    ensure => 'link',
-    mode   => '0644',
-    owner  => $dashboard_user,
-    group  => $dashboard_group,
-    target => '/etc/puppet-dashboard/settings.yml',
+    File["${dashboard_root}/config/settings.yml"] {
+      before  => Class['apache::service'],
+    }
   }
 
   file { [ "${dashboard_root}/log/production.log", "${dashboard_root}/config/environment.rb" ]:
@@ -370,12 +418,10 @@ class dashboard (
     charset  => $dashboard_charset,
   }
 
-  # add also to puppet group to read private ssl key
   user { $dashboard_user:
       ensure     => 'present',
       comment    => 'Puppet Dashboard',
       gid        => $dashboard_group,
-      groups     => ['puppet'],
       shell      => '/bin/false',
       managehome => true,
       home       => "/home/${dashboard_user}",
