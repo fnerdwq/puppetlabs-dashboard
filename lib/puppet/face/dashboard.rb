@@ -99,7 +99,7 @@ Puppet::Face.define(:dashboard, '0.0.1') do
   # 422 for create node - means it does not exist
   action 'create_node' do
     summary 'Creates a node'
-    option '--name=' do
+    option '--create-name=' do
       summary 'Certificate name of node to create'
       required
     end
@@ -141,7 +141,7 @@ Puppet::Face.define(:dashboard, '0.0.1') do
 
   action 'create_class' do
     summary 'Creates a class'
-    option '--name=' do
+    option '--create-name=' do
       summary 'Name of class to create in the dashboard'
       required
     end
@@ -152,7 +152,7 @@ Puppet::Face.define(:dashboard, '0.0.1') do
 
   action 'create_group' do
     summary 'Creates a group'
-    option '--name=' do
+    option '--create-name=' do
       summary 'Name of the group to be created'
       required
     end
@@ -203,17 +203,17 @@ Puppet::Face.define(:dashboard, '0.0.1') do
         '*'
       end
     end
-    option '--modulepath=' do
-      description <<-EOT
-        Path to search for the specified modules.
-      EOT
-      default_to do
-        Puppet[:modulepath]
-      end
-    end
+#    option '--modulepath=' do
+#      description <<-EOT
+#        Path to search for the specified modules.
+#      EOT
+#      default_to do
+#        Puppet[:modulepath]
+#      end
+#    end
     when_invoked do |options|
       connection = Puppet::Dashboard::Classifier.connection(options)
-      connection.register_module(options[:module_name], options[:modulepath])
+      connection.register_module(options[:module_name], Puppet[:modulepath])
     end
   end
 
@@ -224,14 +224,14 @@ Puppet::Face.define(:dashboard, '0.0.1') do
       Uses the puppet module tool to install the specified module from the
       Forge and load its classes into the Dashboard.
     EOT
-    option '--modulepath=' do
-      description <<-EOT
-        Path to search for the specified modules.
-      EOT
-      default_to do
-        Puppet[:modulepath]
-      end
-    end
+#    option '--modulepath=' do
+#      description <<-EOT
+#        Path to search for the specified modules.
+#      EOT
+#      default_to do
+#        Puppet[:modulepath]
+#      end
+#    end
     option '--module-names=' do
       description <<-EOT
         name of module from forge to download
@@ -244,7 +244,7 @@ Puppet::Face.define(:dashboard, '0.0.1') do
       connection = Puppet::Dashboard::Classifier.connection(options)
       connection.add_module(
         Puppet::Dashboard::Classifier.to_array(options[:module_names]),
-        options[:modulepath]
+        Puppet[:modulepath]
       )
     end
   end
