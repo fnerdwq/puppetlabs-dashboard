@@ -295,14 +295,14 @@ class dashboard (
       mode   => '0600',
       owner  => $dashboard_user,
       group  => $dashboard_group,
-      source => "${::puppet_vardir}/ssl/private_keys/${::fqdn}.pem",
+      source => "${::puppet_ssldir}/private_keys/${::fqdn}.pem",
     }
     file { "${dashboard_root}/${_certificate_path}":
       ensure  => present,
       mode    => '0644',
       owner   => $dashboard_user,
       group   => $dashboard_group,
-      source  => "${::puppet_vardir}/ssl/certs/${::fqdn}.pem",
+      source  => "${::puppet_ssldir}/certs/${::fqdn}.pem",
       require => File["${dashboard_root}/${_private_key_path}"],
       before  => File["${dashboard_root}/config/settings.yml"],
     }
