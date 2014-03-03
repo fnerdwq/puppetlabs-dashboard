@@ -213,6 +213,14 @@ class dashboard (
     root_password => $mysql_root_pw,
   }
 
+  # fixes issue of wrong error.log (default) owner on Debian systems
+  if $::osfamily == 'Debian' {
+    file {'/var/log/mysql/error.log':
+      owner   => 'mysql',
+      require => Class['mysql::server'],
+    }
+  }
+
   class { 'mysql::bindings':
     ruby_enable => true,
   }
