@@ -56,8 +56,8 @@ class dashboard::params {
   $puppet_server                   = "puppet.${::domain}"
 
   $apache_ssl                      = false
-  $apache_ssl_cert                 = "${::puppet_ssldir}/${::fqdn}.pem"
-  $apache_ssl_key                  = "${::puppet_ssldir}/${::fqdn}.pem"
+  $apache_ssl_cert                 = "${::puppet_ssldir}/certs/${::fqdn}.pem"
+  $apache_ssl_key                  = "${::puppet_ssldir}/private_keys/${::fqdn}.pem"
 
   case $::osfamily {
 
