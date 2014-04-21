@@ -1,4 +1,4 @@
-# Class: dashboard::passenger
+er Class: dashboard::passenger
 #
 # This class configures parameters for the puppet-dashboard module.
 #
@@ -111,7 +111,7 @@ class dashboard::passenger (
     Apache::Vhost <|title == $dashboard_site|> {
       ssl      => $apache_ssl,
       ssl_cert => $apache_ssl_cert,
-      ssl_key  => $apache_ssl_cert,
+      ssl_key  => $apache_ssl_key,
     }
     
   }
