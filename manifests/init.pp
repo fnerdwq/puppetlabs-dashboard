@@ -67,7 +67,7 @@
 #   [*public_key_path*]
 #
 #   [*ca_server*]
-#     -  Hostname of the certificate authority.
+#     - Hostname of the certificate authority.
 #
 #   [*ca_port*]
 #     - Port for the certificate authority.
@@ -206,7 +206,13 @@ class dashboard (
   $rails_base_uri             = $dashboard::params::rails_base_uri,
   $rack_version               = $dashboard::params::rack_version,
   $cron_optimize              = $dashboard::params::cron_optimize,
-  $cron_prune_reports         = $dashboard::params::cron_prune_reports
+  $cron_prune_reports         = $dashboard::params::cron_prune_reports,
+
+  $auth                       = $dashboard::params::auth,
+  $auth_user                  = $dashboard::params::auth_user,
+  $auth_password              = $dashboard::params::auth_password,
+  $apache_user                = $dashboard::params::apache_user,
+  $puppet_server              = $dashboard::params::puppet_server,
 ) inherits dashboard::params {
 
   class { 'mysql::server':
@@ -233,6 +239,11 @@ class dashboard (
       dashboard_root    => $dashboard_root,
       rails_base_uri    => $rails_base_uri,
       passenger_install => $passenger_install,
+      auth              => $auth,
+      auth_user         => $auth_user,
+      auth_password     => $auth_password,
+      apache_user       => $apache_user,
+      puppet_server     => $puppet_server,
     }
     # debian needs the configuration files for dashboard to start the
     # dashboard workers

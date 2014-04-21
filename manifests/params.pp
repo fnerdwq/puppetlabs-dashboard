@@ -50,6 +50,11 @@ class dashboard::params {
   $cron_optimize                   = false
   $cron_prune_reports              = undef
 
+  $auth                            = false
+  $auth_user                       = undef
+  $auth_password                   = undef
+  $puppet_server                   = "puppet.${::domain}"
+
   case $::osfamily {
 
     'RedHat': {
@@ -57,6 +62,7 @@ class dashboard::params {
       $dashboard_service      = ['puppet-dashboard','puppet-dashboard-workers']
       $dashboard_package      = 'puppet-dashboard'
       $dashboard_root         = '/usr/share/puppet-dashboard'
+      $apache_user            = 'apache'
     }
 
     'Debian': {
@@ -70,6 +76,7 @@ class dashboard::params {
       $dashboard_workers_start   = 'yes'
       $mysql_package_provider    = 'aptitude'
       $ruby_mysql_package        = 'libmysql-ruby1.8'
+      $apache_user               = 'www-data'
     }
 
     default: {

@@ -34,6 +34,11 @@ class dashboard::passenger (
   $dashboard_config,
   $dashboard_root,
   $rails_base_uri,
+  $auth,
+  $auth_user,
+  $auth_password,
+  $apache_user,
+  $puppet_server,
 ) inherits dashboard {
 
   if $passenger_install {
@@ -67,4 +72,29 @@ class dashboard::passenger (
     access_log_format => 'combined',
     custom_fragment   => "RailsBaseURI ${rails_base_uri}",
   }
+
+  if $auth {
+    file { "${dashboard_root}/htpasswd":
+      owner   => $apache_user,
+      group   => $dashboard::dashboard_group,
+      mode    => '0660',
+      content => "${auth_user}:${auth_password}\n",
+    }
+
+    Apache::Vhost <|title == $dashboard_site|> {
+      directories       => [
+      { path            => '/',
+        provider        => 'location',
+        order           => 'allow,deny',
+        allow           => "from ${puppet_server}",
+        auth_name       => 'Puppet Dashboard',
+        auth_type       => 'Basic',
+        auth_user_file  => "${dashboard_root}/htpasswd",
+        auth_require    => 'valid-user',
+        custom_fragment => 'Satisfy any',}
+      ],
+      require +> File["${dashboard_root}/htpasswd"],
+    }
+  }
+
 }
