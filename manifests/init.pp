@@ -307,6 +307,11 @@ class dashboard (
     $_private_key_path = "certs/${::fqdn}.private_key.pem"
     $_certificate_path = "certs/${::fqdn}.cert.pem"
 
+    # to reuse puppet certificates
+    User <|title == $dashboard_user|> {
+      groups +> ['puppet'],
+    }
+
     file { "${dashboard_root}/certs":
       ensure => directory,
       mode   => '0644',
@@ -314,20 +319,16 @@ class dashboard (
       group  => $dashboard_group,
     }
     file { "${dashboard_root}/${_private_key_path}":
-      ensure => present,
-      mode   => '0600',
-      owner  => $dashboard_user,
-      group  => $dashboard_group,
-      source => "${::puppet_ssldir}/private_keys/${::fqdn}.pem",
+      ensure => link,
+      target => "${::puppet_ssldir}/private_keys/${::fqdn}.pem",
+      force  => true,
+      before => File["${dashboard_root}/config/settings.yml"],
     }
     file { "${dashboard_root}/${_certificate_path}":
-      ensure  => present,
-      mode    => '0644',
-      owner   => $dashboard_user,
-      group   => $dashboard_group,
-      source  => "${::puppet_ssldir}/certs/${::fqdn}.pem",
-      require => File["${dashboard_root}/${_private_key_path}"],
-      before  => File["${dashboard_root}/config/settings.yml"],
+      ensure => link,
+      target => "${::puppet_ssldir}/certs/${::fqdn}.pem",
+      force  => true,
+      before => File["${dashboard_root}/config/settings.yml"],
     }
   } else {
     $_cn_name          = $cn_name
