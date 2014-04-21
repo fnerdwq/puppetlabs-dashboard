@@ -1,4 +1,4 @@
-er Class: dashboard::passenger
+# Class: dashboard::passenger
 #
 # This class configures parameters for the puppet-dashboard module.
 #
