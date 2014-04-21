@@ -214,9 +214,9 @@ class dashboard (
   $apache_user                = $dashboard::params::apache_user,
   $puppet_server              = $dashboard::params::puppet_server,
 
-  $apache_ssl                 = $dashboard::params::ssl,
-  $apache_ssl_cert            = $dashboard::params::ssl_cert,
-  $apache_ssl_key             = $dashboard::params::ssl_key,
+  $apache_ssl                 = $dashboard::params::apache_ssl,
+  $apache_ssl_cert            = $dashboard::params::apache_ssl_cert,
+  $apache_ssl_key             = $dashboard::params::apache_ssl_key,
 ) inherits dashboard::params {
 
   class { 'mysql::server':
