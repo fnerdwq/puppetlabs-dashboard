@@ -208,11 +208,15 @@ class dashboard (
   $cron_optimize              = $dashboard::params::cron_optimize,
   $cron_prune_reports         = $dashboard::params::cron_prune_reports,
 
-  $auth                       = $dashboard::params::auth,
-  $auth_user                  = $dashboard::params::auth_user,
-  $auth_password              = $dashboard::params::auth_password,
+  $apache_auth                = $dashboard::params::apache_auth,
+  $apache_auth_user           = $dashboard::params::apache_auth_user,
+  $apache_auth_password       = $dashboard::params::apache_auth_password,
   $apache_user                = $dashboard::params::apache_user,
   $puppet_server              = $dashboard::params::puppet_server,
+
+  $apache_ssl                 = $dashboard::params::ssl,
+  $apache_ssl_cert            = $dashboard::params::ssl_cert,
+  $apache_ssl_key             = $dashboard::params::ssl_key,
 ) inherits dashboard::params {
 
   class { 'mysql::server':
@@ -233,16 +237,16 @@ class dashboard (
 
   if $passenger {
     class { 'dashboard::passenger':
-      dashboard_site    => $dashboard_site,
-      dashboard_port    => $dashboard_port,
-      dashboard_config  => $dashboard_config,
-      dashboard_root    => $dashboard_root,
-      rails_base_uri    => $rails_base_uri,
-      passenger_install => $passenger_install,
-      auth              => $auth,
-      auth_user         => $auth_user,
-      auth_password     => $auth_password,
-      apache_user       => $apache_user,
+      dashboard_site       => $dashboard_site,
+      dashboard_port       => $dashboard_port,
+      dashboard_config     => $dashboard_config,
+      dashboard_root       => $dashboard_root,
+      rails_base_uri       => $rails_base_uri,
+      passenger_install    => $passenger_install,
+      apache_auth          => $apache_auth,
+      apache_auth_user     => $apache_auth_user,
+      apache_auth_password => $apache_auth_password,
+      apache_user          => $apache_user,
       puppet_server     => $puppet_server,
     }
     # debian needs the configuration files for dashboard to start the

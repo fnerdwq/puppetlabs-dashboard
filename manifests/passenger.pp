@@ -34,9 +34,9 @@ class dashboard::passenger (
   $dashboard_config,
   $dashboard_root,
   $rails_base_uri,
-  $auth,
-  $auth_user,
-  $auth_password,
+  $apache_auth,
+  $apache_auth_user,
+  $apache_auth_password,
   $apache_user,
   $puppet_server,
 ) inherits dashboard {
@@ -73,12 +73,12 @@ class dashboard::passenger (
     custom_fragment   => "RailsBaseURI ${rails_base_uri}",
   }
 
-  if $auth {
+  if $apache_auth {
     file { "${dashboard_root}/htpasswd":
       owner   => $apache_user,
       group   => $dashboard::dashboard_group,
       mode    => '0660',
-      content => "${auth_user}:${auth_password}\n",
+      content => "${apache_auth_user}:${apache_auth_password}\n",
     }
 
     Apache::Vhost <|title == $dashboard_site|> {
@@ -95,6 +95,22 @@ class dashboard::passenger (
       ],
       require +> File["${dashboard_root}/htpasswd"],
     }
+  }
+
+  # enable ssl?
+  if $apache_ssl {
+
+    # to reuse puppet certificates
+    User <|title == $apache_user|> {
+      groups +> ['puppet'],
+    }
+
+    Apache::Vhost <|title == $dashboard_site|> {
+      ssl      => $apache_ssl,
+      ssl_cert => $apache_ssl_cert,
+      ssl_key  => $apache_ssl_cert,
+    }
+    
   }
 
 }

@@ -50,10 +50,14 @@ class dashboard::params {
   $cron_optimize                   = false
   $cron_prune_reports              = undef
 
-  $auth                            = false
-  $auth_user                       = undef
-  $auth_password                   = undef
+  $apache_auth                     = false
+  $apache_auth_user                = undef
+  $apache_auth_password            = undef
   $puppet_server                   = "puppet.${::domain}"
+
+  $apache_ssl                      = false
+  $apache_ssl_cert                 = "${::puppet_ssldir}/${::fqdn}.pem"
+  $apache_ssl_key                  = "${::puppet_ssldir}/${::fqdn}.pem"
 
   case $::osfamily {
 
