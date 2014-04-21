@@ -249,8 +249,8 @@ class dashboard (
       apache_user          => $apache_user,
       puppet_server        => $puppet_server,
       apache_ssl           => $apache_ssl,
-      apache_cert          => $apache_cert,
-      apache_key           => $apache_key,
+      apache_ssl_cert      => $apache_ssl_cert,
+      apache_ssl_key       => $apache_ssl_key,
     }
     # debian needs the configuration files for dashboard to start the
     # dashboard workers
