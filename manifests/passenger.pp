@@ -39,6 +39,9 @@ class dashboard::passenger (
   $apache_auth_password,
   $apache_user,
   $puppet_server,
+  $apache_ssl,
+  $apache_ssl_cert,
+  $apache_ssl_key,
 ) inherits dashboard {
 
   if $passenger_install {
