@@ -58,6 +58,7 @@ class dashboard::params {
   $apache_ssl                      = false
   $apache_ssl_cert                 = "${::puppet_ssldir}/certs/${::fqdn}.pem"
   $apache_ssl_key                  = "${::puppet_ssldir}/private_keys/${::fqdn}.pem"
+  $apache_redirect_to_ssl          = false
 
   case $::osfamily {
 

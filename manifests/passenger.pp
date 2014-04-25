@@ -42,6 +42,7 @@ class dashboard::passenger (
   $apache_ssl,
   $apache_ssl_cert,
   $apache_ssl_key,
+  $apache_redirect_to_ssl,
 ) inherits dashboard {
 
   if $passenger_install {
@@ -113,7 +114,20 @@ class dashboard::passenger (
       ssl_cert => $apache_ssl_cert,
       ssl_key  => $apache_ssl_key,
     }
-    
+
+    if $apache_redirect_to_ssl {
+      apache::vhost { "${dashboard_site}_redirect_to_ssl":
+        servername => $dashboard_site,
+        port       => 80,
+        priority   => 50,
+        docroot    => "${dashboard_root}/public",
+        rewrites   => [{
+          rewrite_cond => ['%{HTTPS} off'],
+          rewrite_rule => ['(.*) https://%{HTTP_HOST}%{REQUEST_URI} [R,L]']
+        }],
+      }
+    }
+
   }
 
 }

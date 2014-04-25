@@ -217,6 +217,7 @@ class dashboard (
   $apache_ssl                 = $dashboard::params::apache_ssl,
   $apache_ssl_cert            = $dashboard::params::apache_ssl_cert,
   $apache_ssl_key             = $dashboard::params::apache_ssl_key,
+  $apache_redirect_to_ssl     = $dashboard::params::apache_redirect_to_ssl,
 ) inherits dashboard::params {
 
   class { 'mysql::server':
@@ -237,20 +238,21 @@ class dashboard (
 
   if $passenger {
     class { 'dashboard::passenger':
-      dashboard_site       => $dashboard_site,
-      dashboard_port       => $dashboard_port,
-      dashboard_config     => $dashboard_config,
-      dashboard_root       => $dashboard_root,
-      rails_base_uri       => $rails_base_uri,
-      passenger_install    => $passenger_install,
-      apache_auth          => $apache_auth,
-      apache_auth_user     => $apache_auth_user,
-      apache_auth_password => $apache_auth_password,
-      apache_user          => $apache_user,
-      puppet_server        => $puppet_server,
-      apache_ssl           => $apache_ssl,
-      apache_ssl_cert      => $apache_ssl_cert,
-      apache_ssl_key       => $apache_ssl_key,
+      dashboard_site         => $dashboard_site,
+      dashboard_port         => $dashboard_port,
+      dashboard_config       => $dashboard_config,
+      dashboard_root         => $dashboard_root,
+      rails_base_uri         => $rails_base_uri,
+      passenger_install      => $passenger_install,
+      apache_auth            => $apache_auth,
+      apache_auth_user       => $apache_auth_user,
+      apache_auth_password   => $apache_auth_password,
+      apache_user            => $apache_user,
+      puppet_server          => $puppet_server,
+      apache_ssl             => $apache_ssl,
+      apache_ssl_cert        => $apache_ssl_cert,
+      apache_ssl_key         => $apache_ssl_key,
+      apache_redirect_to_ssl => $apache_redirect_to_ssl,
     }
     # debian needs the configuration files for dashboard to start the
     # dashboard workers
