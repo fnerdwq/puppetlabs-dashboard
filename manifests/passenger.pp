@@ -21,6 +21,33 @@
 #   [*rails_base_uri*]
 #     - The base URI for the application
 #
+#   [*apache_auth*]
+#     - Should we basic auth?
+#
+#   [*apache_auth_user*]
+#     - User for basic auth.
+#
+#   [*apache_auth_password*]
+#     - Password for basic auth user.
+#
+#   [*apache_user*]
+#     - The apache system user.
+#
+#   [*puppet_server*]
+#     - The puppet server (which has to connect w/o auth).
+#
+#   [*apache_ssl*]
+#     - Should the site run behind ssl?
+#
+#   [*apache_ssl_cert*]
+#     - The server cert.
+#
+#   [*apache_ssl_key*]
+#     - The server key.
+#
+#   [*apache_redirect_to_ssl*]
+#     - should non https be redirected to https?
+#
 # Actions:
 #
 # Requires:

@@ -136,6 +136,36 @@
 #     - Install cronjob to prune old reports, format: '<number> <unit>'
 #       where unit: min,hr,day,wk,mon,yr
 #
+#   [*cron_prune_reports*]
+#     - Install cronjob to prune old reports, format: '<number> <unit>'
+#
+#   [*apache_auth*]
+#     - see dashboard::passenger
+#
+#   [*apache_auth_user*]
+#     - see dashboard::passenger
+#
+#   [*apache_auth_password*]
+#     - see dashboard::passenger
+#
+#   [*apache_user*]
+#     - see dashboard::passenger
+#
+#   [*puppet_server*]
+#     - see dashboard::passenger
+#
+#   [*apache_ssl*]
+#     - see dashboard::passenger
+#
+#   [*apache_ssl_cert*]
+#     - see dashboard::passenger
+#
+#   [*apache_ssl_key*]
+#     - see dashboard::passenger
+#
+#   [*apache_redirect_to_ssl*]
+#     - see dashboard::passenger
+#
 # Actions:
 #
 # Requires:
@@ -207,13 +237,11 @@ class dashboard (
   $rack_version               = $dashboard::params::rack_version,
   $cron_optimize              = $dashboard::params::cron_optimize,
   $cron_prune_reports         = $dashboard::params::cron_prune_reports,
-
   $apache_auth                = $dashboard::params::apache_auth,
   $apache_auth_user           = $dashboard::params::apache_auth_user,
   $apache_auth_password       = $dashboard::params::apache_auth_password,
   $apache_user                = $dashboard::params::apache_user,
   $puppet_server              = $dashboard::params::puppet_server,
-
   $apache_ssl                 = $dashboard::params::apache_ssl,
   $apache_ssl_cert            = $dashboard::params::apache_ssl_cert,
   $apache_ssl_key             = $dashboard::params::apache_ssl_key,
