@@ -148,6 +148,18 @@
 #   [*apache_auth_password*]
 #     - see dashboard::passenger
 #
+#   [*apache_auth_require*]
+#     - see dashboard::passenger
+#
+#   [*apache_auth_ldap_binddn*]
+#     - see dashboard::passenger
+#
+#   [*apache_auth_ldap_bindpw*]
+#     - see dashboard::passenger
+#
+#   [*apache_auth_ldap_url*]
+#     - see dashboard::passenger
+#
 #   [*apache_user*]
 #     - see dashboard::passenger
 #
@@ -240,6 +252,10 @@ class dashboard (
   $apache_auth                = $dashboard::params::apache_auth,
   $apache_auth_user           = $dashboard::params::apache_auth_user,
   $apache_auth_password       = $dashboard::params::apache_auth_password,
+  $apache_auth_require        = $dashboard::params::apache_auth_require,
+  $apache_auth_ldap_binddn    = $dashboard::params::apache_auth_ldap_binddn,
+  $apache_auth_ldap_bindpw    = $dashboard::params::apache_auth_ldap_bindpw,
+  $apache_auth_ldap_url       = $dashboard::params::apache_auth_ldap_url,
   $apache_user                = $dashboard::params::apache_user,
   $puppet_server              = $dashboard::params::puppet_server,
   $apache_ssl                 = $dashboard::params::apache_ssl,
@@ -266,21 +282,25 @@ class dashboard (
 
   if $passenger {
     class { 'dashboard::passenger':
-      dashboard_site         => $dashboard_site,
-      dashboard_port         => $dashboard_port,
-      dashboard_config       => $dashboard_config,
-      dashboard_root         => $dashboard_root,
-      rails_base_uri         => $rails_base_uri,
-      passenger_install      => $passenger_install,
-      apache_auth            => $apache_auth,
-      apache_auth_user       => $apache_auth_user,
-      apache_auth_password   => $apache_auth_password,
-      apache_user            => $apache_user,
-      puppet_server          => $puppet_server,
-      apache_ssl             => $apache_ssl,
-      apache_ssl_cert        => $apache_ssl_cert,
-      apache_ssl_key         => $apache_ssl_key,
-      apache_redirect_to_ssl => $apache_redirect_to_ssl,
+      dashboard_site          => $dashboard_site,
+      dashboard_port          => $dashboard_port,
+      dashboard_config        => $dashboard_config,
+      dashboard_root          => $dashboard_root,
+      rails_base_uri          => $rails_base_uri,
+      passenger_install       => $passenger_install,
+      apache_auth             => $apache_auth,
+      apache_auth_user        => $apache_auth_user,
+      apache_auth_password    => $apache_auth_password,
+      apache_auth_require     => $apache_auth_require,
+      apache_auth_ldap_binddn => $apache_auth_ldap_binddn,
+      apache_auth_ldap_bindpw => $apache_auth_ldap_bindpw,
+      apache_auth_ldap_url    => $apache_auth_ldap_url,
+      apache_user             => $apache_user,
+      puppet_server           => $puppet_server,
+      apache_ssl              => $apache_ssl,
+      apache_ssl_cert         => $apache_ssl_cert,
+      apache_ssl_key          => $apache_ssl_key,
+      apache_redirect_to_ssl  => $apache_redirect_to_ssl,
     }
     # debian needs the configuration files for dashboard to start the
     # dashboard workers

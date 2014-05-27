@@ -53,6 +53,10 @@ class dashboard::params {
   $apache_auth                     = false
   $apache_auth_user                = undef
   $apache_auth_password            = undef
+  $apache_auth_require             = undef
+  $apache_auth_ldap_binddn         = undef
+  $apache_auth_ldap_bindpw         = undef
+  $apache_auth_ldap_url            = undef
   $puppet_server                   = "puppet.${::domain}"
 
   $apache_ssl                      = false

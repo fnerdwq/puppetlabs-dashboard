@@ -22,13 +22,25 @@
 #     - The base URI for the application
 #
 #   [*apache_auth*]
-#     - Should we basic auth?
+#     - Should we do no/false, files or ldap auth?
 #
 #   [*apache_auth_user*]
 #     - User for basic auth.
 #
 #   [*apache_auth_password*]
 #     - Password for basic auth user.
+#
+#   [*apache_auth_require*]
+#     - Apache auth require string
+#
+#   [*apache_auth_ldap_binddn*]
+#     - LDAP bind DN for Apache
+#
+#   [*apache_auth_ldap_bindpw*]
+#     - LDAP bind PW for Apache
+#
+#   [*apache_auth_ldap_url*]
+#     - Apache URL for LDAP with possible selectors
 #
 #   [*apache_user*]
 #     - The apache system user.
@@ -64,6 +76,10 @@ class dashboard::passenger (
   $apache_auth,
   $apache_auth_user,
   $apache_auth_password,
+  $apache_auth_require,
+  $apache_auth_ldap_binddn,
+  $apache_auth_ldap_bindpw,
+  $apache_auth_ldap_url,
   $apache_user,
   $puppet_server,
   $apache_ssl,
@@ -104,8 +120,9 @@ class dashboard::passenger (
     custom_fragment   => "RailsBaseURI ${rails_base_uri}",
   }
 
-  if $apache_auth {
-    file { "${dashboard_root}/htpasswd":
+  if $apache_auth == 'file' {
+
+    file { "${dashboard_root}/htpasswa":
       owner   => $apache_user,
       group   => $dashboard::dashboard_group,
       mode    => '0660',
@@ -126,6 +143,30 @@ class dashboard::passenger (
       ],
       require +> File["${dashboard_root}/htpasswd"],
     }
+  } elsif $apache_auth == 'ldap' {
+
+    include apache::mod::authnz_ldap
+
+    Apache::Vhost <|title == $dashboard_site|> {
+      directories           => [
+      { path                => '/',
+        provider            => 'location',
+        order               => 'allow,deny',
+        allow               => "from ${puppet_server}",
+        auth_name           => 'Puppet Dashboard',
+        auth_type           => 'Basic',
+        auth_basic_provider => 'ldap',
+        auth_require        => $apache_auth_require,
+        custom_fragment     => "Satisfy any
+    AuthLDAPBindDN \"${apache_auth_ldap_binddn}\"
+    AuthLDAPBindPassword \"${apache_auth_ldap_bindpw}\"
+    AuthLDAPURL \"${apache_auth_ldap_url}\""
+        ,}
+      ],
+    }
+
+  } else {
+    # no auth!
   }
 
   # enable ssl?
